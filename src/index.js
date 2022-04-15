@@ -4,6 +4,7 @@ const exec = util.promisify(require('child_process').exec);
 const ws = require('ws');
 const express = require('express');
 const fs = require('fs');
+const path = require('path');
 
 const PORT = 5100;
 const WS_PORT = 5101;
@@ -35,21 +36,21 @@ wss.on('connection', async wsc => {
 
 });
 
-app.use(express.static('public'));
+app.use(express.static(path.resolve(__dirname, 'public')));
 
 app.listen(PORT)
 
 async function run(wsc) {
 	if (await isRunning()) return null;
 
-	fs.writeFileSync(LOG_FILE, '');
+	fs.writeFileSync(path.resolve(__dirname, LOG_FILE), '');
 
 	const overviwer = spawn('/usr/bin/overviewer.py', ['-c', '/etc/overviewer/overviewer.conf']);
 
 	overviwer.stdout.on('data', data => {
 		const out = data.toString();
 		console.log(out);
-		fs.appendFile(LOG_FILE, out, error => {
+		fs.appendFile(path.resolve(__dirname, LOG_FILE), out, error => {
 			if (error) console.error(error);
 		});
 		wsc.send(JSON.stringify({status: 'OUT', out: out}));
