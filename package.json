@@ -1,0 +1,24 @@
+{
+  "name": "overviewer-console",
+  "version": "1.0.0",
+  "description": "Operator console for Minecraft Overviewer",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devlysh/overviewer-console.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/devlysh/overviewer-console/issues"
+  },
+  "homepage": "https://github.com/devlysh/overviewer-console#readme",
+  "dependencies": {
+    "express": "^4.17.3",
+    "ws": "^8.5.0"
+  }
+}
