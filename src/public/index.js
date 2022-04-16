@@ -56,6 +56,10 @@
 				case 'ERROR':
 					appendError(data.error);
 					break;
+				case 'RUN':
+					clearLog();
+					disableForm();	
+					break;
 			}
 		}
 
@@ -66,7 +70,6 @@
 
 
 	function run(socket) {
-		clearLog();
 		socket.send('[[RUN]]');
 	}
 
@@ -89,11 +92,9 @@
 
 	function enableForm() {
 		runButton.disabled = false;
-		mapUrl.classList.remove('disabled');
 	}
 
 	function disableForm() {
 		runButton.disabled = true;
-		mapUrl.classList.add('disabled');
 	}
 })();

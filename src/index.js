@@ -27,8 +27,8 @@ wss.on('connection', async wsc => {
 
 		switch (data) {
 			case '[[RUN]]':
-				wsc.send(JSON.stringify({action: 'UP'}));
 				run(wsc);
+				wsc.send(JSON.stringify({action: 'UP'}));
 				break;
 		}
 
@@ -42,6 +42,9 @@ app.listen(PORT)
 
 async function run(wsc) {
 	if (await isRunning()) return null;
+	wss.clients.forEach(client => {
+		client.send(JSON.stringify({action: 'RUN'}));
+	});
 
 	fs.writeFileSync(path.resolve(__dirname, LOG_FILE), '');
 
@@ -53,7 +56,10 @@ async function run(wsc) {
 		fs.appendFile(path.resolve(__dirname, LOG_FILE), out, error => {
 			if (error) console.error(error);
 		});
-		wsc.send(JSON.stringify({action: 'OUT', out: out}));
+
+		wss.clients.forEach(client => {
+			client.send(JSON.stringify({action: 'OUT', out: out}));
+		});
 	});
 
 	overviwer.stderr.on('data', data => {
@@ -63,7 +69,9 @@ async function run(wsc) {
 	});
 
 	overviwer.on('close', (code) => {
-		wsc.send(JSON.stringify({action: 'DOWN'}));
+		wss.clients.forEach(client => {
+			client.send(JSON.stringify({action: 'DOWN'}));
+		});
 	});
 }
 
