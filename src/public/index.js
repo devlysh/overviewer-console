@@ -15,26 +15,31 @@
 
 	function connect() {
 		const socket = new WebSocket('wss://ws.overviewer.hochburg.devlysh.com');
-		
-		socket.addEventListener('open', event => {
+
+		socket.addEventListener('open', onOpen);
+		socket.addEventListener('close', onClose);
+		socket.addEventListener('error', onError);
+		socket.addEventListener('message', onMessage);
+
+		function onOpen(event) {
 			runButton.addEventListener('click', runWithSocket);
 			enableForm();
 			console.log(`Socket is open.`);
-		});
+		}
 
-		socket.addEventListener('close', event => {
+		function onClose(event) {
 			runButton.removeEventListener('click', () => runWithSocket);
 			disableForm();
 			console.log(`Socket is closed. Reconnect will be attemped in 1 second. ${event.reason}`);
 			setTimeout(connect, 1000);
-		});
+		}
 
-		socket.addEventListener('error', error => {
+		function onError(error) {
 			console.error(`Socket encountered error: ${JSON.stringify(error)}. Closing socket`);
 			socket.close();
-		});
+		}
 
-		socket.addEventListener('message', event => {
+		function onMessage(event) {
 			const data = JSON.parse(event.data);
 
 			if (!data.status) return;
@@ -52,12 +57,13 @@
 					appendError(data.error);
 					break;
 			}
-		});
+		}
 
 		function runWithSocket() {
 			run(socket);
 		}
 	}
+
 
 	function run(socket) {
 		clearLog();
