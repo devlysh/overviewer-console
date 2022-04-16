@@ -1,43 +1,65 @@
 
 (() => {
-	fetch('./overviewer.log')
-		.then(data => data.text())
-		.then(data => {
-			const lines = data.split('\n');
-			lines.forEach(appendOutput);
-		});
-	const socket = new WebSocket('wss://ws.overviewer.hochburg.devlysh.com');
 	const log = document.querySelector('.log');
 	const mapUrl = document.querySelector('.map-url');
 	const runButton = document.querySelector('.run-button');
 	const clearLogButton = document.querySelector('.clear-log-button');
 
-	socket.addEventListener('open', event => {
-		clearLogButton.addEventListener('click', clearLog);
-		runButton.addEventListener('click', run);
-	});
+	clearLogButton.addEventListener('click', clearLog);
 
-	socket.addEventListener('message', event => {
-		const data = JSON.parse(event.data);
+	fetch('./overviewer.log')
+		.then(data => data.text())
+		.then(text => text.split('\n').forEach(appendOutput));
 
-		if (!data.status) return;
-		switch (data.status) {
-			case 'UP':
-				disableButton();	
-				break;
-			case 'DOWN':
-				enableButton();	
-				break;
-			case 'OUT':
-				appendOutput(data.out);
-				break;
-			case 'ERROR':
-				appendError(data.error);
-				break;
+	connect();
+
+	function connect() {
+		const socket = new WebSocket('wss://ws.overviewer.hochburg.devlysh.com');
+		
+		socket.addEventListener('open', event => {
+			runButton.addEventListener('click', runWithSocket);
+			enableForm();
+			console.log(`Socket is open.`);
+		});
+
+		socket.addEventListener('close', event => {
+			runButton.removeEventListener('click', () => runWithSocket);
+			disableForm();
+			console.log(`Socket is closed. Reconnect will be attemped in 1 second. ${event.reason}`);
+			setTimeout(connect, 1000);
+		});
+
+		socket.addEventListener('error', error => {
+			console.error(`Socket encountered error: ${JSON.stringify(error)}. Closing socket`);
+			socket.close();
+		});
+
+		socket.addEventListener('message', event => {
+			const data = JSON.parse(event.data);
+
+			if (!data.status) return;
+			switch (data.status) {
+				case 'UP':
+					disableForm();	
+					break;
+				case 'DOWN':
+					enableForm();	
+					break;
+				case 'OUT':
+					appendOutput(data.out);
+					break;
+				case 'ERROR':
+					appendError(data.error);
+					break;
+			}
+		});
+
+		function runWithSocket() {
+			run(socket);
 		}
-	});
+	}
 
-	function run() {
+	function run(socket) {
 		clearLog();
 		socket.send('[[RUN]]');
 	}
@@ -59,12 +81,12 @@
 		log.appendChild(p);
 	}
 
-	function enableButton() {
+	function enableForm() {
 		runButton.disabled = false;
 		mapUrl.classList.remove('disabled');
 	}
 
-	function disableButton() {
+	function disableForm() {
 		runButton.disabled = true;
 		mapUrl.classList.add('disabled');
 	}
