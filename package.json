@@ -4,7 +4,7 @@
   "description": "Overviewer Console",
   "main": "index.js",
   "scripts": {
-    "start": "npm run serve",
+    "start": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
     "watch": "webpack --watch",
@@ -28,8 +28,6 @@
   "devDependencies": {
     "copy-webpack-plugin": "^10.2.4",
     "webpack": "^5.72.0",
-    "webpack-cli": "^4.9.2",
-    "webpack-dev-server": "^4.8.1",
-    "webpack-node-externals": "^3.0.0"
+    "webpack-cli": "^4.9.2"
   }
 }
