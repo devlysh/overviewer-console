@@ -42,8 +42,8 @@
 		function onMessage(event) {
 			const data = JSON.parse(event.data);
 
-			if (!data.status) return;
-			switch (data.status) {
+			if (!data.action) return;
+			switch (data.action) {
 				case 'UP':
 					disableForm();	
 					break;

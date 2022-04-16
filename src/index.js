@@ -17,9 +17,9 @@ const app = express();
 
 wss.on('connection', async wsc => {
 	if (await isRunning()) {
-		wsc.send(JSON.stringify({status: 'UP'}));
+		wsc.send(JSON.stringify({action: 'UP'}));
 	} else {
-		wsc.send(JSON.stringify({status: 'DOWN'}));
+		wsc.send(JSON.stringify({action: 'DOWN'}));
 	}
 
 	wsc.on('message', async message => {
@@ -27,7 +27,7 @@ wss.on('connection', async wsc => {
 
 		switch (data) {
 			case '[[RUN]]':
-				wsc.send(JSON.stringify({status: 'UP'}));
+				wsc.send(JSON.stringify({action: 'UP'}));
 				run(wsc);
 				break;
 		}
@@ -53,17 +53,17 @@ async function run(wsc) {
 		fs.appendFile(path.resolve(__dirname, LOG_FILE), out, error => {
 			if (error) console.error(error);
 		});
-		wsc.send(JSON.stringify({status: 'OUT', out: out}));
+		wsc.send(JSON.stringify({action: 'OUT', out: out}));
 	});
 
 	overviwer.stderr.on('data', data => {
 		const error = data.toString();
 		console.error(`Error: ${error}`);
-		wsc.send(JSON.stringify({status: 'ERROR', error: error}));
+		wsc.send(JSON.stringify({action: 'ERROR', error: error}));
 	});
 
 	overviwer.on('close', (code) => {
-		wsc.send(JSON.stringify({status: 'DOWN'}));
+		wsc.send(JSON.stringify({action: 'DOWN'}));
 	});
 }
 
