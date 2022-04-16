@@ -2,13 +2,12 @@
 
 Operator console for Minecraft Overviewer
 
-## Run locally
+## Build
 
 ```
 npm start
 ```
-
-## Build
+or
 
 ```
 npm run build
