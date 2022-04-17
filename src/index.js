@@ -28,7 +28,6 @@ wss.on('connection', async wsc => {
 		switch (data) {
 			case '[[RUN]]':
 				run(wsc);
-				wsc.send(JSON.stringify({action: 'UP'}));
 				break;
 		}
 
